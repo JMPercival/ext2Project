@@ -1,3 +1,7 @@
 sda2
 *.pyc
 ext2Copy
+.idea/
+ext2ShortCopy
+scripts/fileToOpen
+scripts/outfile
