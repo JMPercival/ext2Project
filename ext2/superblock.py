@@ -112,7 +112,7 @@ class superblock:
         self.s_reserved= getHex(self.superblock, 0x108, 0x400, False)#/* Padding to the end of the block [190]? */
 
         ##MY VARS##
-        self.desc_block_num=int(self.s_blocks_count,16) / int(self.s_blocks_per_group, 16)
+        self.desc_block_num=int(int(self.s_blocks_count,16) / int(self.s_blocks_per_group, 16))
             #if sparse_super is on
         self.desc_blocks_with_super = set([0,1]+[3**x for x in range(1,int(ceil(log(self.desc_block_num,3))))] +\
             [5**x for x in range(1,int(ceil(log(self.desc_block_num,5))))] + \
