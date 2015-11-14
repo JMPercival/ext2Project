@@ -2,7 +2,7 @@
 
 from partHelp import *
 import partData
-from ext4 import ext4
+from ext2 import ext2
 
 ##
 # MBR partioning:
@@ -27,8 +27,8 @@ for index, part in enumerate(parts):
 	partsFrame.append(tempPartFrame)
 
 print(partsFrame)
-a = ext4(partsFrame[1])
+a = ext2(partsFrame[1])
 print(a.superblock)
-print(a.s_last_error_block)
+#print(a.s_last_error_block)
 
 #take the second partition and start ext4 work on it

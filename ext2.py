@@ -1,7 +1,50 @@
 from math import log, ceil
 from partHelp import *
 
-class ext4:
+class ext2:
+    def compatFeatures(self):
+        self.s_feature_compat_dict={}
+        # Block pre-allocation for new directories
+        #(Preallocate some number of (contiguous?) blocks (see byte 205 in the superblock)
+        #   to a directory when creating a new one (to reduce fragmentation?))
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_PREALLOC'] = getBitmap(int(self.s_feature_compat, 16), 1)
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_PREALLOC'], \
+        # AFS server inodes exist
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_IMAGIC_INODES'], \
+        # File system has a journal (Ext3)
+        self.s_feature_compat_dict['EXT3_FEATURE_COMPAT_HAS_JOURNAL'], \
+        # Inodes have extended attributes
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_EXT_ATTR'], \
+        # Non-standard inode size used (File system can resize itself for larger partitions)
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_RESIZE_INO'], \
+        # Directory indexing (HTree) (Directories use hash index) 
+        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_INDEX']  \
+        = getBitmap(int(self.s_feature_compat, 16), 6)
+
+    def incompatFeatures(self):
+        self.s_feature_incompat_dict={}
+        # Disk/File compression is used
+        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_COMPRESSION'], \
+        # Directory entries contain a type field
+        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_FILETYPE'], \
+        # File system needs to replay its journal
+        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_RECOVER'], \
+        # File system uses a journal device
+        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_JOURNAL_DEV'], \
+        # None (Possibly not supported?)
+        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_META_BG'], \
+        = getBitmap(int(self.s_feature_incompat, 16), 5) 
+
+    def roFeatures(self): 
+        self.s_feature_ro_compat_dict={}
+        # Sparse superblocks and group descriptor tables
+        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER'], \
+        # Large file support, 64-bit file size
+        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_LARGE_FILE'], \
+        # Binary tree sorted directory files 
+        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'], \
+        = getBitmap(int(self.s_feature_ro_compat, 16), 3)
+
     def __init__(self, part):
         #superblock is 1024 bytes
         #superblock is after 1024 bytes of padding and 512 bytes of MBR
@@ -68,53 +111,9 @@ class ext4:
             [5**x for x in range(1,int(ceil(log(self.desc_block_num,5))))] + \
             [7**x for x in range(1,int(ceil(log(self.desc_block_num,7))))])
 
-        compatFeatures(self)
-        incompatFeatures(self)
-        roFeatures(self)
-
-
-    def compatFeatures(self):
-        self.s_feature_compat_dict={}
-        # Block pre-allocation for new directories
-        #(Preallocate some number of (contiguous?) blocks (see byte 205 in the superblock)
-        #   to a directory when creating a new one (to reduce fragmentation?))
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_PREALLOC'], \
-        # AFS server inodes exist
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_IMAGIC_INODES'], \
-        # File system has a journal (Ext3)
-        self.s_feature_compat_dict['EXT3_FEATURE_COMPAT_HAS_JOURNAL'], \
-        # Inodes have extended attributes
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_EXT_ATTR'], \
-        # Non-standard inode size used (File system can resize itself for larger partitions)
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_RESIZE_INO'], \
-        # Directory indexing (HTree) (Directories use hash index)
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_INDEX']  \
-        = getBitmap(int(self.s_feature_compat, 16), 6)
-
-    def incompatFeatures(self):
-        self.s_feature_incompat_dict={}
-        # Disk/File compression is used
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_COMPRESSION'], \
-        # Directory entries contain a type field
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_FILETYPE'], \
-        # File system needs to replay its journal
-        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_RECOVER'], \
-        # File system uses a journal device
-        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_JOURNAL_DEV'], \
-        # None (Possibly not supported?)
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_META_BG'], \
-        = getBitmap(int(self.s_feature_incompat, 16), 5)
-
-    def roFeatures(self):
-        self.s_feature_ro_compat_dict={}
-        # Sparse superblocks and group descriptor tables
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER'], \
-        # Large file support, 64-bit file size
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_LARGE_FILE'], \
-        # Binary tree sorted directory files
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'], \
-        = getBitmap(int(self.s_feature_ro_compat, 16), 3)
-
+        self.compatFeatures()
+        self.incompatFeatures()
+        self.roFeatures()
 
 
 
