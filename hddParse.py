@@ -26,7 +26,8 @@ for index, part in enumerate(parts):
 
 print(partsFrame)
 a = ext2(partsFrame[1])
-print(a.superblock)
+a.buildGroupDescriptors()
+a.getInodeTables()
 #print(a.s_last_error_block)
 
 #take the second partition and start ext4 work on it
