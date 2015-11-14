@@ -3,11 +3,12 @@ from partHelp import *
 
 class ext2:
     def compatFeatures(self):
-        self.s_feature_compat_dict={}
+        self.s_feature_compat_dict={'EXT2_FEATURE_COMPAT_DIR_PREALLOC':False,'EXT2_FEATURE_COMPAT_IMAGIC_INODES':False,\
+                                    'EXT3_FEATURE_COMPAT_HAS_JOURNAL':False,'EXT2_FEATURE_COMPAT_EXT_ATTR':False,\
+                                    'EXT2_FEATURE_COMPAT_RESIZE_INO':False,'EXT2_FEATURE_COMPAT_DIR_INDEX':False}
         # Block pre-allocation for new directories
         #(Preallocate some number of (contiguous?) blocks (see byte 205 in the superblock)
         #   to a directory when creating a new one (to reduce fragmentation?))
-        self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_PREALLOC'] = getBitmap(int(self.s_feature_compat, 16), 1)
         self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_DIR_PREALLOC'], \
         # AFS server inodes exist
         self.s_feature_compat_dict['EXT2_FEATURE_COMPAT_IMAGIC_INODES'], \
@@ -22,7 +23,9 @@ class ext2:
         = getBitmap(int(self.s_feature_compat, 16), 6)
 
     def incompatFeatures(self):
-        self.s_feature_incompat_dict={}
+        self.s_feature_incompat_dict={'EXT2_FEATURE_INCOMPAT_COMPRESSION':False,'EXT2_FEATURE_INCOMPAT_FILETYPE':False,\
+                                      'EXT3_FEATURE_INCOMPAT_RECOVER':False,'EXT3_FEATURE_INCOMPAT_JOURNAL_DEV':False,\
+                                      'EXT2_FEATURE_INCOMPAT_META_BG':False}
         # Disk/File compression is used
         self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_COMPRESSION'], \
         # Directory entries contain a type field
@@ -36,7 +39,8 @@ class ext2:
         = getBitmap(int(self.s_feature_incompat, 16), 5) 
 
     def roFeatures(self): 
-        self.s_feature_ro_compat_dict={}
+        self.s_feature_ro_compat_dict={'EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER':False,'EXT2_FEATURE_RO_COMPAT_LARGE_FILE':False,\
+                                      'EXT2_FEATURE_RO_COMPAT_BTREE_DIR':False}
         # Sparse superblocks and group descriptor tables
         self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER'], \
         # Large file support, 64-bit file size
