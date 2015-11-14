@@ -5,3 +5,5 @@ ext2Copy
 ext2ShortCopy
 scripts/fileToOpen
 scripts/outfile
+helpData/
+tmpfileForData
