@@ -35,7 +35,7 @@ class ext2:
         # File system uses a journal device
         self.s_feature_incompat_dict['EXT3_FEATURE_INCOMPAT_JOURNAL_DEV'], \
         # None (Possibly not supported?)
-        self.s_feature_incompat_dict['EXT2_FEATURE_INCOMPAT_META_BG'], \
+        self.s_feature_incompat_dict['EXT2_FEATURE_INCOMPAT_META_BG'] \
         = getBitmap(int(self.s_feature_incompat, 16), 5) 
 
     def roFeatures(self): 
@@ -46,7 +46,7 @@ class ext2:
         # Large file support, 64-bit file size
         self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_LARGE_FILE'], \
         # Binary tree sorted directory files 
-        self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'], \
+        self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'] \
         = getBitmap(int(self.s_feature_ro_compat, 16), 3)
 
     def __init__(self, part):
