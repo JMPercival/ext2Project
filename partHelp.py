@@ -29,3 +29,21 @@ def getLocation(count, skip): #TODO: Add functionality to pass in the HDD I am l
 	hexStr = binascii.hexlify(myoutput.read())
 
 	return hexStr
+
+#takes two integers and returns out a binary true/false list of numToReturn size
+#!!RETURNS bitmap from low to high!!
+def getBitmap(intToCheck, numToReturn):
+    bitmap=bin(intToCheck)[::-1][:-2]
+    newBitmap=[]
+    for bit in bitmap:
+        newBitmap.append(False if bit=='0' else True)
+    leftOver = numToReturn - len(newBitmap)
+    if leftOver > 0:
+        while leftOver != 0:
+            newBitmap.append(False)
+            leftOver -= 1
+    elif leftOver < 0:
+        while leftOver != 0:
+            newBitmap.pop()
+            leftOver+=1
+    return newBitmap
