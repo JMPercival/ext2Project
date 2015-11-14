@@ -1,8 +1,6 @@
-
-
 from partHelp import *
 import partData
-from ext2/ext2 import ext2
+from ext2.ext2 import ext2
 
 ##
 # MBR partioning:
