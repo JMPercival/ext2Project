@@ -3,9 +3,7 @@ from partHelp import *
 
 class ext2:
     def compatFeatures(self):
-        self.s_feature_compat_dict={'EXT2_FEATURE_COMPAT_DIR_PREALLOC':False,'EXT2_FEATURE_COMPAT_IMAGIC_INODES':False,\
-                                    'EXT3_FEATURE_COMPAT_HAS_JOURNAL':False,'EXT2_FEATURE_COMPAT_EXT_ATTR':False,\
-                                    'EXT2_FEATURE_COMPAT_RESIZE_INO':False,'EXT2_FEATURE_COMPAT_DIR_INDEX':False}
+        self.s_feature_compat_dict={}
         # Block pre-allocation for new directories
         #(Preallocate some number of (contiguous?) blocks (see byte 205 in the superblock)
         #   to a directory when creating a new one (to reduce fragmentation?))
@@ -23,30 +21,27 @@ class ext2:
         = getBitmap(int(self.s_feature_compat, 16), 6)
 
     def incompatFeatures(self):
-        self.s_feature_incompat_dict={'EXT2_FEATURE_INCOMPAT_COMPRESSION':False,'EXT2_FEATURE_INCOMPAT_FILETYPE':False,\
-                                      'EXT3_FEATURE_INCOMPAT_RECOVER':False,'EXT3_FEATURE_INCOMPAT_JOURNAL_DEV':False,\
-                                      'EXT2_FEATURE_INCOMPAT_META_BG':False}
+        self.s_feature_incompat_dict={}
         # Disk/File compression is used
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_COMPRESSION'], \
+        self.s_feature_incompat_dict['EXT2_FEATURE_INCOMPAT_COMPRESSION'], \
         # Directory entries contain a type field
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_FILETYPE'], \
+        self.s_feature_incompat_dict['EXT2_FEATURE_INCOMPAT_FILETYPE'], \
         # File system needs to replay its journal
-        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_RECOVER'], \
+        self.s_feature_incompat_dict['EXT3_FEATURE_INCOMPAT_RECOVER'], \
         # File system uses a journal device
-        self.s_feature_compat_dict['EXT3_FEATURE_INCOMPAT_JOURNAL_DEV'], \
+        self.s_feature_incompat_dict['EXT3_FEATURE_INCOMPAT_JOURNAL_DEV'], \
         # None (Possibly not supported?)
-        self.s_feature_compat_dict['EXT2_FEATURE_INCOMPAT_META_BG'], \
+        self.s_feature_incompat_dict['EXT2_FEATURE_INCOMPAT_META_BG'], \
         = getBitmap(int(self.s_feature_incompat, 16), 5) 
 
     def roFeatures(self): 
-        self.s_feature_ro_compat_dict={'EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER':False,'EXT2_FEATURE_RO_COMPAT_LARGE_FILE':False,\
-                                      'EXT2_FEATURE_RO_COMPAT_BTREE_DIR':False}
+        self.s_feature_ro_compat_dict={}
         # Sparse superblocks and group descriptor tables
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER'], \
+        self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER'], \
         # Large file support, 64-bit file size
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_LARGE_FILE'], \
+        self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_LARGE_FILE'], \
         # Binary tree sorted directory files 
-        self.s_feature_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'], \
+        self.s_feature_ro_compat_dict['EXT2_FEATURE_RO_COMPAT_BTREE_DIR'], \
         = getBitmap(int(self.s_feature_ro_compat, 16), 3)
 
     def __init__(self, part):
