@@ -57,9 +57,9 @@ class superblock:
         #for backwards compatibility with my other code
         self.superblock = part
         self.part = part
-        #####################################################333
-        #All entires below have been scraped from the ext4 wiki#
-        ########################################################
+        #####################################################################
+        #All entires below have been scraped from the ext4 wiki then changed#
+        #####################################################################
         #Total inode count.
         self.s_inodes_count= getHex(self.superblock, 0x0, 0x4, True)#/* Inodes count */
         self.s_blocks_count= getHex(self.superblock, 0x4, 0x8, True)#/* Blocks count */
