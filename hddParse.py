@@ -28,6 +28,7 @@ print(partsFrame)
 a = ext2(partsFrame[1])
 a.buildGroupDescriptors()
 a.getInodeTables()
+a.getInode(2)
 #print(a.s_last_error_block)
 
 #take the second partition and start ext4 work on it

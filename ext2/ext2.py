@@ -2,6 +2,7 @@ from math import log, ceil
 from partHelp import *
 import ext2.superblock as superblock
 import ext2.groupDescriptor as groupDescriptor
+import ext2.inode as inode
 
 class ext2:
     def __init__(self, part):
@@ -26,6 +27,12 @@ class ext2:
             print(x.part)
             print([int(x.bg_inode_table,16), int(x.bg_inode_bitmap, 16)])
 
+    def getInode(self, num):
+        inodeCreation = getLocation(256, 0x143300)
+        a = inode.inode(inodeCreation)
+        print(a.i_atime_date)
+        print(a.i_block)
+        print(int(a.directBlock0,16))
 
 
 
