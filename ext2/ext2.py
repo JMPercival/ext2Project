@@ -17,14 +17,14 @@ class ext2:
     def buildGroupDescriptors(self):
         self.groupDescs = []
         #need to pull out the location first for speed purposes
-        descGroupHex = getLocation(0x20 * self.sb.desc_block_num, self.part + 0x1200)
+        descGroupHex = getLocation(0x20 * (self.sb.desc_block_num+1), 0x1200)
         for groupDescInd in range(self.sb.desc_block_num):
             self.groupDescs.append(groupDescriptor.groupDescriptor(getHex(descGroupHex, 0x20*groupDescInd, 0x20+0x20*groupDescInd)))
 
     def getInodeTables(self):
         for x in self.groupDescs:
-            print(int(x.bg_inode_table,16))
-
+            print(x.part)
+            print([int(x.bg_inode_table,16), int(x.bg_inode_bitmap, 16)])
 
 
 
