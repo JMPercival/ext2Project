@@ -1,13 +1,14 @@
 import binascii
 from subprocess import Popen, PIPE, run
 from time import sleep
+from struct import unpack
 
 def littleEndian(hexStr):
-	endStr = b''
-	for x in range(0,len(hexStr), 2):
-		#endStr = hexStr[x:x+2]
-		endStr = hexStr[x:x+2] + endStr
-	return endStr
+        endStr = ''
+        for x in range(0,len(hexStr), 2):
+            #endStr = hexStr[x:x+2]
+            endStr = hexStr[x:x+2] + endStr
+        return endStr
 
 def getHex(hexStr, start, end='', le=False):
 	if end == '':
@@ -30,9 +31,30 @@ def getLocation(count, skip): #TODO: Add functionality to pass in the HDD I am l
     myoutput = open('tmpfileForData', 'rb')
     hexStr = binascii.hexlify(myoutput.read())
     '''
-    pro = run(['dd', 'if=ext2Copy', 'bs=1', 'count='+str(count), 'skip='+str(skip)], stderr=PIPE, stdin=PIPE)
-    #TODO: should probably raise an exception here if stderr flags something
-    return pro.stdout
+    pro = run(['dd', 'if=ext2Copy', 'bs=1', 'count='+str(count), 'skip='+str(skip)], stderr=PIPE, stdout=PIPE)
+    #TODO: should probably raise an exception here if stderr flags is something important
+    #print(type(pro.stdout))
+    #hexStr = map(hex, map(ord, bytearray(pro.stdout)))
+    #print(hexStr)
+    #thisOut = ''.join(c[2:4] for c in hexStr)
+
+    hexList = []
+    for x in pro.stdout:
+        hexList.append(hex(x))
+
+
+    #intList = [unpack('B', c)[0] for c in pro.stdout]
+    #thisOut = intList
+    outString = ''
+    for c in hexList:
+        if len(c) == 3:
+            outString += '0'+c[2]
+        else:
+            outString += c[2:4]
+    
+    #thisOut = ''.join(c[2:4] for c in hexList)
+
+    return outString
 
 #takes two integers and returns out a binary true/false list of numToReturn size
 #!!RETURNS bitmap from low to high!!

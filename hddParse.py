@@ -8,13 +8,15 @@ from ext2.ext2 import ext2
 ##
 
 hexStr = getLocation(512, 0)
-
+print(len(hexStr))
 parts = []
 partsFrame = []
 #iterate the 4 partitions and push the bytes into parts
 #TODO: add ability to parse extended partitions
 for x in range(446,446+(16*4),16):
 	parts.append(getHex(hexStr, x, x+16))
+
+print(parts)
 
 for index, part in enumerate(parts):
 	tempPartFrame = {}

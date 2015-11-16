@@ -79,18 +79,20 @@ class ext2:
         for blockNeeded in blocksNeeded:
             directoryList += self.getDirectoryBlock(blockNeeded)
 
+        return directoryList
 
     def getDirectoryBlock(self, blockNeeded):
         #print('here')
         directoryList = []
         raw_block = getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size)
-        from time import sleep
-        sleep(2)
-        print(raw_block)
-        while int(getHex(raw_block, 0x0, 0x4),16) != 0:
+        count=0
+        while raw_block != '':
+            print(len(raw_block))
+            print(raw_block[:90])
+            count+=1
             newDir = directory.directory(raw_block,self.sb)
             directoryList.append(newDir)
-            raw_block = raw_block[int(newDir.rec_len, 16):]
+            raw_block = raw_block[int(newDir.rec_len, 16)*2:]
         return directoryList
 
 
