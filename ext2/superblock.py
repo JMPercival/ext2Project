@@ -117,6 +117,8 @@ class superblock:
         self.desc_blocks_with_super = set([0,1]+[3**x for x in range(1,int(ceil(log(self.desc_block_num,3))))] +\
             [5**x for x in range(1,int(ceil(log(self.desc_block_num,5))))] + \
             [7**x for x in range(1,int(ceil(log(self.desc_block_num,7))))])
+        self.block_size = 1024 << int(self.s_log_block_size,16)
+
 
         self.compatFeatures()
         self.incompatFeatures()

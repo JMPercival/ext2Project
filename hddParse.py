@@ -26,9 +26,10 @@ for index, part in enumerate(parts):
 
 print(partsFrame)
 a = ext2(partsFrame[1])
-a.buildGroupDescriptors()
-a.getInodeTables()
-a.getInode(2)
+#a.buildGroupDescriptors()
+#a.getInodeTables()
+#a.getInode(2)
+a.buildFileTree()
 #print(a.s_last_error_block)
 
 #take the second partition and start ext4 work on it
