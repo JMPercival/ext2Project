@@ -10,7 +10,6 @@ class ext2:
         self.part = part['start']*512
         self.sb = superblock.superblock(getLocation(0x400, self.part + 0x400))
 
-
     def iterateGroupGenerator(self):
         for group in range(self.sb.desc_block_num):
             pass
@@ -19,7 +18,7 @@ class ext2:
     def buildGroupDescriptors(self):
         self.groupDescs = []
         #need to pull out the location first for speed purposes
-        descGroupHex = getLocation(0x20 * (self.sb.desc_block_num+1), 0x1200)
+        descGroupHex = getLocation(0x20 * (self.sb.desc_block_num), 0x1200)
         for groupDescInd in range(self.sb.desc_block_num):
             self.groupDescs.append(groupDescriptor.groupDescriptor(getHex(descGroupHex, 0x20*groupDescInd, 0x20+0x20*groupDescInd)))
 
@@ -27,46 +26,67 @@ class ext2:
         self.inode_tables_location_to_groups = {}
         self.block_bitmaps = {}
         self.inode_bitmaps = {}
-        counter = 1
+        counter = 0
+        print(len(self.groupDescs))
         for groupDesc in self.groupDescs:
+            #print(self.part)
+            #print(int(groupDesc.bg_inode_table, 16), self.sb.block_size)
             self.inode_tables_location_to_groups[counter] = self.part + (int(groupDesc.bg_inode_table,16) * self.sb.block_size)
             self.inode_bitmaps[counter] = self.part + (int(groupDesc.bg_inode_table,16) * self.sb.block_size)
             self.block_bitmaps[counter] = self.part + (int(groupDesc.bg_inode_table,16) * self.sb.block_size)
             counter+=1
 
     def getInode(self, num):
+        num = num - 1 #there is not 0 inode so we shift what we asked for down to comply with FS
         inode_block_group = int(num/int(self.sb.s_inodes_per_group,16))
-        inode_block_group_location = self.inode_tables[inode_block_group]
+        inode_block_group_location = self.inode_tables_location_to_groups[inode_block_group]
         inode_inside_block_group = int(num%int(self.sb.s_inodes_per_group,16))
         inode_inside_block_group_location = inode_inside_block_group * int(self.sb.s_inode_size,16)
         inode_final_location = int(inode_block_group_location + inode_inside_block_group_location)
 
-        newInode = inode.inode(getLocation(self.sb.s_inode_size, self.part + inode_final_location))
+        print(self.inode_tables_location_to_groups)
+        print(inode_block_group, inode_block_group_location, inode_inside_block_group, inode_inside_block_group_location)
+        print(inode_final_location, self.sb.block_size)
+        
+        newInode = inode.inode(getLocation(self.sb.s_inode_size, inode_final_location))
         #print(a.i_atime_date)
         #print(a.i_block)
         #print(int(a.directBlock0,16))
+        print(newInode.part)
         return newInode
 
     def buildFileTree(self):
+        #print('here2')
         root_directory_inode = self.getInode(2)
+        #print(root_directory_inode.i_block_dict)
+        #print(root_directory_inode.i_block)
         root_directory_list = self.getDirectoryList(root_directory_inode)
         print(root_directory_list)
 
     def getDirectoryList(self, inode):
         blocksNeeded = []
-        for i_block in inode.i_block_dict:
-            if inode.i_block_dict[i_block] == False:
-                break
+        for single_i_block in inode.i_block_list:
+            if single_i_block != False:
+                blocksNeeded.append(int(single_i_block,16))
             else:
-                blocksNeeded.append(int(inode.i_block_dict[i_block],16))
+                break
+
+        print(inode.i_block)
+        print(inode.i_block_list) 
+        print(blocksNeeded)
+
         directoryList = []
         for blockNeeded in blocksNeeded:
             directoryList += self.getDirectoryBlock(blockNeeded)
 
 
     def getDirectoryBlock(self, blockNeeded):
+        #print('here')
         directoryList = []
-        raw_block = getLocation(getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size))
+        raw_block = getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size)
+        from time import sleep
+        sleep(2)
+        print(raw_block)
         while int(getHex(raw_block, 0x0, 0x4),16) != 0:
             newDir = directory.directory(raw_block,self.sb)
             directoryList.append(newDir)

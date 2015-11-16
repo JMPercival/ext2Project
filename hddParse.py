@@ -25,10 +25,11 @@ for index, part in enumerate(parts):
 	partsFrame.append(tempPartFrame)
 
 print(partsFrame)
-a = ext2(partsFrame[1])
-#a.buildGroupDescriptors()
-#a.getInodeTables()
+a = ext2(partsFrame[0])
+
 #a.getInode(2)
+a.buildGroupDescriptors()
+a.buildLocations()
 a.buildFileTree()
 #print(a.s_last_error_block)
 

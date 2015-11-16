@@ -34,21 +34,23 @@ class inode:
         self.i_dtime_date=time.ctime(int(self.i_dtime,16))
 
         self.i_block_dict={
-            self.directBlock0 : getHex(self.i_block, 0x0, 0x4, True) if int(getHex(self.i_block, 0x0, 0x4, True),16) ==0 else False,
-            self.directBlock1 : getHex(self.i_block, 0x4, 0x8, True) if int(getHex(self.i_block, 0x4, 0x8, True),16) ==0 else False,
-            self.directBlock2 : getHex(self.i_block, 0x8, 0xc, True) if int(getHex(self.i_block, 0x8, 0xc, True),16) ==0 else False,
-            self.directBlock3 : getHex(self.i_block, 0xc, 0x10, True) if int(getHex(self.i_block, 0xc, 0x10, True),16) ==0 else False,            self.directBlock4 : getHex(self.i_block, 0x10, 0x14, True) if int(getHex(self.i_block, 0x4, 0x8, True),16) ==0 else False,,
-            self.directBlock5 : getHex(self.i_block, 0x14, 0x18, True) if int(getHex(self.i_block, 0x14, 0x18, True),16) ==0 else False,
-            self.directBlock6 : getHex(self.i_block, 0x18, 0x1c, True) if int(getHex(self.i_block, 0x18, 0x1c, True),16) ==0 else False,
-            self.directBlock7 : getHex(self.i_block, 0x1c, 0x20, True) if int(getHex(self.i_block, 0x1c, 0x20, True),16) ==0 else False,
-            self.directBlock8 : getHex(self.i_block, 0x20, 0x24, True) if int(getHex(self.i_block, 0x20, 0x24, True),16) ==0 else False,
-            self.directBlock9 : getHex(self.i_block, 0x24, 0x28, True) if int(getHex(self.i_block, 0x24, 0x28, True),16) ==0 else False,
-            self.directBlock10 : getHex(self.i_block, 0x28, 0x2c, True) if int(getHex(self.i_block, 0x28, 0x2c, True),16) ==0 else False,
-            self.directBlock11 : getHex(self.i_block, 0x2c, 0x30, True) if int(getHex(self.i_block, 0x2c, 0x30, True),16) ==0 else False,
-            self.singleIndirect : getHex(self.i_block, 0x30, 0x34, True) if int(getHex(self.i_block, 0x30, 0x34, True),16) ==0 else False,
-            self.doubleIndirect : getHex(self.i_block, 0x34, 0x38, True) if int(getHex(self.i_block, 0x34, 0x38, True),16) ==0 else False,
-            self.tripleIndirect : getHex(self.i_block, 0x38, 0x3c, True) if int(getHex(self.i_block, 0x38, 0x3c, True),16) ==0 else False
+            'directBlock0' : getHex(self.i_block, 0x0, 0x4, True) if int(getHex(self.i_block, 0x0, 0x4, True),16) !=0 else False,
+            'directBlock1' : getHex(self.i_block, 0x4, 0x8, True) if int(getHex(self.i_block, 0x4, 0x8, True),16) !=0 else False,
+            'directBlock2' : getHex(self.i_block, 0x8, 0xc, True) if int(getHex(self.i_block, 0x8, 0xc, True),16) !=0 else False,
+            'directBlock3' : getHex(self.i_block, 0xc, 0x10, True) if int(getHex(self.i_block, 0xc, 0x10, True),16) !=0 else False,            
+            'directBlock4' : getHex(self.i_block, 0x10, 0x14, True) if int(getHex(self.i_block, 0x10, 0x14, True),16) !=0 else False,
+            'directBlock5' : getHex(self.i_block, 0x14, 0x18, True) if int(getHex(self.i_block, 0x14, 0x18, True),16) !=0 else False,
+            'directBlock6' : getHex(self.i_block, 0x18, 0x1c, True) if int(getHex(self.i_block, 0x18, 0x1c, True),16) !=0 else False,
+            'directBlock7' : getHex(self.i_block, 0x1c, 0x20, True) if int(getHex(self.i_block, 0x1c, 0x20, True),16) !=0 else False,
+            'directBlock8' : getHex(self.i_block, 0x20, 0x24, True) if int(getHex(self.i_block, 0x20, 0x24, True),16) !=0 else False,
+            'directBlock9' : getHex(self.i_block, 0x24, 0x28, True) if int(getHex(self.i_block, 0x24, 0x28, True),16) !=0 else False,
+            'directBlock10' : getHex(self.i_block, 0x28, 0x2c, True) if int(getHex(self.i_block, 0x28, 0x2c, True),16) !=0 else False,
+            'directBlock11' : getHex(self.i_block, 0x2c, 0x30, True) if int(getHex(self.i_block, 0x2c, 0x30, True),16) !=0 else False,
+            'singleIndirect' : getHex(self.i_block, 0x30, 0x34, True) if int(getHex(self.i_block, 0x30, 0x34, True),16) !=0 else False,
+            'doubleIndirect' : getHex(self.i_block, 0x34, 0x38, True) if int(getHex(self.i_block, 0x34, 0x38, True),16) !=0 else False,
+            'tripleIndirect' : getHex(self.i_block, 0x38, 0x3c, True) if int(getHex(self.i_block, 0x38, 0x3c, True),16) !=0 else False
         }
+        self.i_block_list = [self.i_block_dict['directBlock0'], self.i_block_dict['directBlock1'],self.i_block_dict['directBlock2'],self.i_block_dict['directBlock3'],self.i_block_dict['directBlock4'],self.i_block_dict['directBlock5'],self.i_block_dict['directBlock6'],self.i_block_dict['directBlock7'],self.i_block_dict['directBlock8'],self.i_block_dict['directBlock9'],self.i_block_dict['directBlock10'],self.i_block_dict['directBlock11'],self.i_block_dict['singleIndirect'],self.i_block_dict['doubleIndirect'],self.i_block_dict['tripleIndirect']]
 
         self.reserved_inodes = {0:"Doesn't exist; there is no inode 0.",1:"List of defective blocks.",
                                 2:"Root directory.",
