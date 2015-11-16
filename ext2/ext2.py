@@ -6,6 +6,8 @@ import ext2.superblock as superblock
 import ext2.groupDescriptor as groupDescriptor
 import ext2.inode as inode
 import ext2.directory as directory
+import sys
+sys.setrecursionlimit(20000)
 
 class ext2:
     def __init__(self, part):
@@ -29,7 +31,7 @@ class ext2:
         self.block_bitmaps = {}
         self.inode_bitmaps = {}
         counter = 0
-        print(len(self.groupDescs))
+        #print(len(self.groupDescs))
         for groupDesc in self.groupDescs:
             #print(self.part)
             #print(int(groupDesc.bg_inode_table, 16), self.sb.block_size)
@@ -46,15 +48,15 @@ class ext2:
         inode_inside_block_group_location = inode_inside_block_group * int(self.sb.s_inode_size,16)
         inode_final_location = int(inode_block_group_location + inode_inside_block_group_location)
 
-        print(self.inode_tables_location_to_groups)
-        print(inode_block_group, inode_block_group_location, inode_inside_block_group, inode_inside_block_group_location)
-        print(inode_final_location, self.sb.block_size)
+        #print(self.inode_tables_location_to_groups)
+        #print(inode_block_group, inode_block_group_location, inode_inside_block_group, inode_inside_block_group_location)
+        #print(inode_final_location, self.sb.block_size)
         
         newInode = inode.inode(getLocation(self.sb.s_inode_size, inode_final_location))
         #print(a.i_atime_date)
         #print(a.i_block)
         #print(int(a.directBlock0,16))
-        print(newInode.part)
+        #print(newInode.part)
         return newInode
 
     def buildFileTree(self):
@@ -73,8 +75,8 @@ class ext2:
         dir_dict = {}
         for dir in dirs:
             if dir.isFiletype() and partData.directory_type[int(dir.file_type,16)] == "Directory":
-                newDirs = getDirectoryList(int(dir.inode,16))
-                dir_dict[dir] = recurBuildFileTree(newDirs)
+                newDirs = self.getDirectoryList(self.getInode(int(dir.inode,16)))
+                dir_dict[dir] = self.recurBuildFileTree(newDirs)
             elif dir.isFiletype() == False:
                 #TODO: handle if the directory has no filetype
                 print("The directory has no filetype, this isn't handled yet.")
@@ -94,9 +96,9 @@ class ext2:
             else:
                 break
 
-        print(inode.i_block)
-        print(inode.i_block_list) 
-        print(blocksNeeded)
+        #print(inode.i_block)
+        #print(inode.i_block_list) 
+        #print(blocksNeeded)
 
         #TODO: URGENT: Add single, double, and triple redirects
         directoryList = []
@@ -111,8 +113,8 @@ class ext2:
         raw_block = getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size)
         count=0
         while raw_block != '':
-            print(len(raw_block))
-            print(raw_block[:90])
+            #print(len(raw_block))
+            #print(raw_block[:90])
             count+=1
             newDir = directory.directory(raw_block,self.sb)
             directoryList.append(newDir)
