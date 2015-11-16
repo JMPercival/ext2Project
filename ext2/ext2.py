@@ -1,5 +1,7 @@
 from math import log, ceil
 from partHelp import *
+from sys import exit
+import partData
 import ext2.superblock as superblock
 import ext2.groupDescriptor as groupDescriptor
 import ext2.inode as inode
@@ -60,8 +62,29 @@ class ext2:
         root_directory_inode = self.getInode(2)
         #print(root_directory_inode.i_block_dict)
         #print(root_directory_inode.i_block)
+        #builds tree root
         root_directory_list = self.getDirectoryList(root_directory_inode)
-        print(root_directory_list)
+
+        tree_dict = self.recurBuildFileTree(root_directory_list)
+        print(tree_dict)
+
+    def recurBuildFileTree(self, dirs):
+        files = []
+        dir_dict = {}
+        for dir in dirs:
+            if dir.isFiletype() and partData.directory_type[int(dir.file_type,16)] == "Directory":
+                newDirs = getDirectoryList(int(dir.inode,16))
+                dir_dict[dir] = recurBuildFileTree(newDirs)
+            elif dir.isFiletype() == False:
+                #TODO: handle if the directory has no filetype
+                print("The directory has no filetype, this isn't handled yet.")
+                sys.exit(0)
+            else:
+                files.append(dir)
+
+        dir_dict['files'] = files
+        return dir_dict
+
 
     def getDirectoryList(self, inode):
         blocksNeeded = []
@@ -75,6 +98,7 @@ class ext2:
         print(inode.i_block_list) 
         print(blocksNeeded)
 
+        #TODO: URGENT: Add single, double, and triple redirects
         directoryList = []
         for blockNeeded in blocksNeeded:
             directoryList += self.getDirectoryBlock(blockNeeded)
@@ -94,8 +118,6 @@ class ext2:
             directoryList.append(newDir)
             raw_block = raw_block[int(newDir.rec_len, 16)*2:]
         return directoryList
-
-
 
 
 
