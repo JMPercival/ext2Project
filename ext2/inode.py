@@ -52,7 +52,8 @@ class inode:
         }
         self.i_block_list = [self.i_block_dict['directBlock0'], self.i_block_dict['directBlock1'],self.i_block_dict['directBlock2'],self.i_block_dict['directBlock3'],self.i_block_dict['directBlock4'],self.i_block_dict['directBlock5'],self.i_block_dict['directBlock6'],self.i_block_dict['directBlock7'],self.i_block_dict['directBlock8'],self.i_block_dict['directBlock9'],self.i_block_dict['directBlock10'],self.i_block_dict['directBlock11'],self.i_block_dict['singleIndirect'],self.i_block_dict['doubleIndirect'],self.i_block_dict['tripleIndirect']]
 
-        self.reserved_inodes = {0:"Doesn't exist; there is no inode 0.",1:"List of defective blocks.",
+        self.reserved_inodes = {0:"Doesn't exist; there is no inode 0.",
+                                1:"List of defective blocks.",
                                 2:"Root directory.",
                                 3:"User Quota",
                                 4:"Group Quota",

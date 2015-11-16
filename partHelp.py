@@ -1,5 +1,5 @@
 import binascii
-from subprocess import Popen, PIPE 
+from subprocess import Popen, PIPE, run
 from time import sleep
 
 def littleEndian(hexStr):
@@ -18,17 +18,21 @@ def getHex(hexStr, start, end='', le=False):
 		return littleEndian(hexStr[start * 2 : end * 2])
 
 def getLocation(count, skip): #TODO: Add functionality to pass in the HDD I am looking at
-	#hard coded as /dev/sda currently
+	#hard coded as ext2Copy currently
 	#bs is currently 1 because it lets me just around easier in the hard drive
-	pro = Popen(['dd', 'if=ext2Copy', 'of=tmpfileForData', 'bs=1', 'count='+str(count), 'skip='+str(skip)], stderr=PIPE) #change this to take an input
-	while pro.poll == None:
-		sleep(.3)
-	sleep(1)
-	
-	myoutput = open('tmpfileForData', 'rb')
-	hexStr = binascii.hexlify(myoutput.read())
+    '''
+    #old code that is now buggy, I am replacing it with a non-file based approach
+    pro = Popen(['dd', 'if=ext2Copy', 'of=tmpfileForData', 'bs=1', 'count='+str(count), 'skip='+str(skip)], stderr=PIPE) #change this to take an input
+    while pro.poll == None:
+        sleep(.3)
+    sleep(1)
 
-	return hexStr
+    myoutput = open('tmpfileForData', 'rb')
+    hexStr = binascii.hexlify(myoutput.read())
+    '''
+    pro = run(['dd', 'if=ext2Copy', 'bs=1', 'count='+str(count), 'skip='+str(skip)], stderr=PIPE, stdin=PIPE)
+    #TODO: should probably raise an exception here if stderr flags something
+    return pro.stdout
 
 #takes two integers and returns out a binary true/false list of numToReturn size
 #!!RETURNS bitmap from low to high!!
