@@ -13,7 +13,10 @@ class directory:
         else:
             self.name_len= getHex(self.part, 0x6, 0x8, True) #Name Length
             self.filetype_is_on = False
-        self.name= getHex(self.part, 0x8, 0x8 + int(self.name_len,16), True)#Name characters
+        self.name= getHex(self.part, 0x8, 0x8 + int(self.name_len,16), False)#Name characters
+
+        self.decoded_name = ''.join([chr(int(self.name[c:c+2], 16)) for c in range(0,len(self.name),2)])
+
 
     def isFiletype(self):
         return True if self.filetype_is_on == True else False

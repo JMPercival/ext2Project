@@ -6,9 +6,7 @@ import ext2.superblock as superblock
 import ext2.groupDescriptor as groupDescriptor
 import ext2.inode as inode
 import ext2.directory as directory
-import sys
 import dataStructures.filetree as filetree
-sys.setrecursionlimit(20000)
 
 class ext2:
     def iterateGroupGenerator(self):
@@ -138,54 +136,20 @@ class ext2:
             return 0 #operation successful return code
 
         for dir_object in self.current_dir_list:
-            if dir == dir_object.name and dir_object.isFiletype() and dir_object.file_type == 'Directory':
+            if dir == dir_object.decoded_name and dir_object.isFiletype() and partData.directory_type[int(dir_object.file_type, 16)] == 'Directory':
                 self.userCDSwitchDir(dir_object)
                 return 0 #operation successful return code
             elif dir_object.isFiletype() == False:
                 return 1 #filetype operation not supported... your in trouble
-            elif dir == dir_object.name and dir_object.isFiletype() and dir_object.file_type != 'Directory':
+            elif dir == dir_object.decoded_name and dir_object.isFiletype() and partData.directory_type[int(dir_object.file_type, 16)] != 'Directory':
                 return 2 #Can not cd into file return code
         return 3 #can not find file return code
 
     def userCDSwitchDir(self, dir_object):
-        new_directory_inode = self.getInode(dir_object.inode)
+        new_directory_inode = self.getInode(int(dir_object.inode,16))
         self.current_dir_list = self.getDirectoryList(new_directory_inode)
 
     def userLS(self, dir):
         for dir_object in self.current_dir_list:
-            print(dir_object.name)
-
-    def userPWD(self):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            print(dir_object.decoded_name)
 

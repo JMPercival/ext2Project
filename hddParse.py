@@ -19,7 +19,7 @@ class hddParse:
         hexStr = getLocation(512, 0)
         for x in range(446,446+(16*4),16):
             self.parts.append(getHex(hexStr, x, x+16))
-        for index, part in enumerate(parts):
+        for index, part in enumerate(self.parts):
             tempPartFrame = {}
             tempPartFrame['start']=int(littleEndian(getHex(part,8,12)), 16)
             tempPartFrame['end']=int(littleEndian(getHex(part,8,12)), 16) + int(littleEndian(getHex(part,12,16)), 16)-1
@@ -31,11 +31,11 @@ class hddParse:
     def acceptUserInput(self):
         while(1):
             print('>',end='')
-            user_input = raw_input()
+            user_input = input()
             self.parseInput(user_input)
 
     def parseInput(self, user_input):
-        user_input = user_input.lower().lstrip()
+        user_input = user_input.lstrip()
         user_input_options = user_input.rstrip().split()[1:]
         user_input_options_len = len(user_input_options)
         if user_input == 'help':
@@ -48,16 +48,18 @@ class hddParse:
             self.userPWD()
         elif user_input[:4] == 'quit':
             self.userQUIT()
+        else:
+            print('Bad command given')
 
     def printHelp(self):
-        print('help:\n\t\tPrints this message')
-        print('cd:\t\tcd [dir]\n\t\tChange the shell working directory')
-        print('ls:\t\tls [FILE]\n\t\tList information about the FILEs(current dir by default)')
-        print('pwd:\t\tpwd\n\t\tPrints the name of the current working directory')
-        print('quit:\t\tquit\n\t\tQuits out of the program')
+        print('help:\thelp\n\tPrints this message\n')
+        print('cd:\tcd [dir]\n\tChange the shell working directory\n')
+        print('ls:\tls [FILE]\n\tList information about the FILEs(current dir by default)\n')
+        print('pwd:\tpwd\n\tPrints the name of the current working directory\n')
+        print('quit:\tquit\n\tQuits out of the program\n')
 
     def userCD(self, dir='/'):
-        dir = dir.replace('/', '').replace('\\', '').lower()
+        dir = dir.replace('/', '').replace('\\', '')
         returnCode = self.filesystem.userCD(dir)
 
         if returnCode == 0:
@@ -73,10 +75,13 @@ class hddParse:
             self.currentDir = '/'
 
     def userLS(self, dir='/'):
-        self.filesystem.userCD(dir)
+        self.filesystem.userLS(dir)
 
     def userPWD(self):
         print(self.currentDir)
 
     def userQUIT(self):
         exit(0)
+
+start = hddParse()
+start.acceptUserInput()
