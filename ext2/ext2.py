@@ -149,7 +149,17 @@ class ext2:
         new_directory_inode = self.getInode(int(dir_object.inode,16))
         self.current_dir_list = self.getDirectoryList(new_directory_inode)
 
-    def userLS(self, dir):
-        for dir_object in self.current_dir_list:
-            print(dir_object.decoded_name)
+    def userLS(self, long):
+        if long:
+            for dir_object in self.current_dir_list:
+
+                print(dir_object.decoded_name+'\t', end='')
+        else:
+            count = 0
+            for dir_object in self.current_dir_list:
+                if count >= 5:
+                    print()
+                    count=0
+                print(dir_object.decoded_name+'\t', end='')
+                count=+1
 

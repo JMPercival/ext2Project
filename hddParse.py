@@ -39,11 +39,11 @@ class hddParse:
         user_input_options = user_input.rstrip().split()[1:]
         user_input_options_len = len(user_input_options)
         if user_input == 'help':
-            self.printHelp()
+            self.userHELP()
         elif user_input[:2] == 'cd':
             self.userCD(user_input_options[0]) if user_input_options_len > 0 else self.userCD()
         elif user_input[:2] == 'ls':
-            self.userLS(user_input_options[0]) if user_input_options_len > 0 else self.userLS()
+            self.userLS(long=True) if user_input_options_len > 0 else self.userLS()
         elif user_input[:3] == 'pwd':
             self.userPWD()
         elif user_input[:4] == 'quit':
@@ -51,10 +51,10 @@ class hddParse:
         else:
             print('Bad command given')
 
-    def printHelp(self):
+    def userHELP(self):
         print('help:\thelp\n\tPrints this message\n')
         print('cd:\tcd [dir]\n\tChange the shell working directory\n')
-        print('ls:\tls [FILE]\n\tList information about the FILEs(current dir by default)\n')
+        print('ls:\tls [-l]\n\tList information about the FILEs(current dir by default)\n')
         print('pwd:\tpwd\n\tPrints the name of the current working directory\n')
         print('quit:\tquit\n\tQuits out of the program\n')
 
@@ -74,8 +74,8 @@ class hddParse:
         if dir == '':
             self.currentDir = '/'
 
-    def userLS(self, dir='/'):
-        self.filesystem.userLS(dir)
+    def userLS(self, long=False):
+        self.filesystem.userLS(long)
 
     def userPWD(self):
         print(self.currentDir)
