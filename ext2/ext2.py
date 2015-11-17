@@ -7,13 +7,10 @@ import ext2.groupDescriptor as groupDescriptor
 import ext2.inode as inode
 import ext2.directory as directory
 import sys
+import dataStructures.filetree as filetree
 sys.setrecursionlimit(20000)
 
 class ext2:
-    def __init__(self, part):
-        self.part = part['start']*512
-        self.sb = superblock.superblock(getLocation(0x400, self.part + 0x400))
-
     def iterateGroupGenerator(self):
         for group in range(self.sb.desc_block_num):
             pass
@@ -40,6 +37,10 @@ class ext2:
             self.block_bitmaps[counter] = self.part + (int(groupDesc.bg_inode_table,16) * self.sb.block_size)
             counter+=1
 
+    def buildRootDir(self):
+        root_directory_inode = self.getInode(2)
+        self.current_dir_list = self.getDirectoryList(root_directory_inode)
+
     def getInode(self, num):
         num = num - 1 #there is not 0 inode so we shift what we asked for down to comply with FS
         inode_block_group = int(num/int(self.sb.s_inodes_per_group,16))
@@ -59,6 +60,7 @@ class ext2:
         #print(newInode.part)
         return newInode
 
+    #pretty sure I am going to not do this... takes too much ram to build the full tree...
     def buildFileTree(self):
         #print('here2')
         root_directory_inode = self.getInode(2)
@@ -70,6 +72,7 @@ class ext2:
         tree_dict = self.recurBuildFileTree(root_directory_list)
         print(tree_dict)
 
+    #since I am not building the tree... this gets to be deprecated....
     def recurBuildFileTree(self, dirs):
         files = []
         dir_dict = {}
@@ -86,7 +89,6 @@ class ext2:
 
         dir_dict['files'] = files
         return dir_dict
-
 
     def getDirectoryList(self, inode):
         blocksNeeded = []
@@ -120,6 +122,61 @@ class ext2:
             directoryList.append(newDir)
             raw_block = raw_block[int(newDir.rec_len, 16)*2:]
         return directoryList
+
+    def __init__(self, part):
+        self.part = part['start']*512
+        self.sb = superblock.superblock(getLocation(0x400, self.part + 0x400))
+        self.my_filetree = filetree.filetree()
+        self.buildGroupDescriptors()
+        self.buildLocations()
+        self.buildRootDir()
+
+    #Here starts the things I can ask the filesystem after all this building
+    def userCD(self, dir):
+        if dir == '':
+            self.buildRootDir()
+            return 0 #operation successful return code
+
+        for dir_object in self.current_dir_list:
+            if dir == dir_object.name and dir_object.isFiletype() and dir_object.file_type == 'Directory':
+                self.userCDSwitchDir(dir_object)
+                return 0 #operation successful return code
+            elif dir_object.isFiletype() == False:
+                return 1 #filetype operation not supported... your in trouble
+            elif dir == dir_object.name and dir_object.isFiletype() and dir_object.file_type != 'Directory':
+                return 2 #Can not cd into file return code
+        return 3 #can not find file return code
+
+    def userCDSwitchDir(self, dir_object):
+        new_directory_inode = self.getInode(dir_object.inode)
+        self.current_dir_list = self.getDirectoryList(new_directory_inode)
+
+    def userLS(self, dir):
+        for dir_object in self.current_dir_list:
+            print(dir_object.name)
+
+    def userPWD(self):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
