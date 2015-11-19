@@ -26,7 +26,7 @@ class hddParse:
             tempPartFrame['size']=int(littleEndian(getHex(part,12,16)), 16)
             tempPartFrame['part_type']=partData.partition_type[getHex(part, 4)]
             self.partsFrame.append(tempPartFrame)
-        self.filesystem = ext2(self.partsFrame[0])
+        self.filesystem = ext2(self.partsFrame[1])
 
     def acceptUserInput(self):
         while(1):
@@ -43,7 +43,7 @@ class hddParse:
         elif user_input[:2] == 'cd':
             self.userCD(user_input_options[0]) if user_input_options_len > 0 else self.userCD()
         elif user_input[:2] == 'ls':
-            self.userLS(user_input_options[0:]) if user_input_options_len > 0 else self.userLS()
+            self.userLS(user_input_options[0:]) if user_input_options_len > 0 else self.userLS([])
         elif user_input[:3] == 'pwd':
             self.userPWD()
         elif user_input[:4] == 'quit':

@@ -158,36 +158,39 @@ class ext2:
                     dir_object_inode = self.getInode(int(dir_object.inode,16))
                     file_type = int(dir_object.file_type,16)
                     permission_bitmap = getBitmap(int(dir_object_inode.i_mode, 16), 12)
-                    permission_string = 'x' if permission_bitmap[0] else ''
-                    permission_string += 'w' if permission_bitmap[1] else ''
-                    permission_string += 'r' if permission_bitmap[2] else ''
-                    permission_string += 'x' if permission_bitmap[3] else ''
-                    permission_string += 'w' if permission_bitmap[4] else ''
-                    permission_string += 'r' if permission_bitmap[5] else ''
-                    permission_string += 'x' if permission_bitmap[6] else ''
-                    permission_string += 'w' if permission_bitmap[7] else ''
-                    permission_string += 'r' if permission_bitmap[8] else ''
+                    permission_string = 'x' if permission_bitmap[0] else '-'
+                    permission_string += 'w' if permission_bitmap[1] else '-'
+                    permission_string += 'r' if permission_bitmap[2] else '-'
+                    permission_string += 'x' if permission_bitmap[3] else '-'
+                    permission_string += 'w' if permission_bitmap[4] else '-'
+                    permission_string += 'r' if permission_bitmap[5] else '-'
+                    permission_string += 'x' if permission_bitmap[6] else '-'
+                    permission_string += 'w' if permission_bitmap[7] else '-'
+                    permission_string += 'r' if permission_bitmap[8] else '-'
                     permission_string += partData.directory_type_letter[file_type]
                     permission_string = permission_string[::-1]
-                    permission_string[0] = 'S' if permission_bitmap[9] else ''
-                    permission_string[4] = 'S' if permission_bitmap[10] else ''
-                    permission_string[1] = 'S' if permission_bitmap[11] else ''
+                    permission_string = list(permission_string)
+                    if permission_bitmap[9]:permission_string[0] = 'S'
+                    if permission_bitmap[10]:permission_string[4] = 'S' 
+                    if permission_bitmap[11]:permission_string[1] = 'S' 
+                    permission_string = ''.join(permission_string)
                     uid = int(dir_object_inode.i_uid, 16)
                     gid = int(dir_object_inode.i_gid, 16)
                     size = int(dir_object_inode.i_size, 16)
-                    i_atime = self.i_atime_date.split()
+                    i_atime = dir_object_inode.i_atime_date.split()
                     overall_time = ' '.join(i_atime[1:4])
                     print('{0}\t{1}\t{2}\t{3}\t{4}\t'.format(permission_string, uid, gid, size, overall_time) ,end='')
                 print(dir_object.decoded_name)
 
         else:
-            count = 0
+            newline_counter = 0
             for dir_object in self.current_dir_list:
-                if count >= 5:
-                    print()
-                    count=0
-                print(dir_object.decoded_name+'\t', end='')
-                count=+1
+                if newline_counter >= 5:
+                    print('')
+                    newline_counter = 0
+                print(dir_object.decoded_name+'\t\t', end='')
+                newline_counter += 1
+            print('')
 
 
 
