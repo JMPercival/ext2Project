@@ -43,7 +43,7 @@ class hddParse:
         elif user_input[:2] == 'cd':
             self.userCD(user_input_options[0]) if user_input_options_len > 0 else self.userCD()
         elif user_input[:2] == 'ls':
-            self.userLS(long=True) if user_input_options_len > 0 else self.userLS()
+            self.userLS(user_input_options[0:]) if user_input_options_len > 0 else self.userLS()
         elif user_input[:3] == 'pwd':
             self.userPWD()
         elif user_input[:4] == 'quit':
@@ -74,8 +74,15 @@ class hddParse:
         if dir == '':
             self.currentDir = '/'
 
-    def userLS(self, long=False):
-        self.filesystem.userLS(long)
+    def userLS(self, user_options):
+        long=False
+        inode=False
+        user_option = ''.join(user_options)
+        if 'l' in user_option:
+            long = True
+        if 'i' in user_option:
+            inode = True
+        self.filesystem.userLS(long=long, inode=inode)
 
     def userPWD(self):
         print(self.currentDir)

@@ -149,11 +149,37 @@ class ext2:
         new_directory_inode = self.getInode(int(dir_object.inode,16))
         self.current_dir_list = self.getDirectoryList(new_directory_inode)
 
-    def userLS(self, long):
-        if long:
+    def userLS(self, long=False, inode=False):
+        if long or inode:
             for dir_object in self.current_dir_list:
+                if inode:
+                    print(int(dir_object.inode,16), end='\t')
+                if long:
+                    dir_object_inode = self.getInode(int(dir_object.inode,16))
+                    file_type = int(dir_object.file_type,16)
+                    permission_bitmap = getBitmap(int(dir_object_inode.i_mode, 16), 12)
+                    permission_string = 'x' if permission_bitmap[0] else ''
+                    permission_string += 'w' if permission_bitmap[1] else ''
+                    permission_string += 'r' if permission_bitmap[2] else ''
+                    permission_string += 'x' if permission_bitmap[3] else ''
+                    permission_string += 'w' if permission_bitmap[4] else ''
+                    permission_string += 'r' if permission_bitmap[5] else ''
+                    permission_string += 'x' if permission_bitmap[6] else ''
+                    permission_string += 'w' if permission_bitmap[7] else ''
+                    permission_string += 'r' if permission_bitmap[8] else ''
+                    permission_string += partData.directory_type_letter[file_type]
+                    permission_string = permission_string[::-1]
+                    permission_string[0] = 'S' if permission_bitmap[9] else ''
+                    permission_string[4] = 'S' if permission_bitmap[10] else ''
+                    permission_string[1] = 'S' if permission_bitmap[11] else ''
+                    uid = int(dir_object_inode.i_uid, 16)
+                    gid = int(dir_object_inode.i_gid, 16)
+                    size = int(dir_object_inode.i_size, 16)
+                    i_atime = self.i_atime_date.split()
+                    overall_time = ' '.join(i_atime[1:4])
+                    print('{0}\t{1}\t{2}\t{3}\t{4}\t'.format(permission_string, uid, gid, size, overall_time) ,end='')
+                print(dir_object.decoded_name)
 
-                print(dir_object.decoded_name+'\t', end='')
         else:
             count = 0
             for dir_object in self.current_dir_list:
@@ -162,4 +188,8 @@ class ext2:
                     count=0
                 print(dir_object.decoded_name+'\t', end='')
                 count=+1
+
+
+
+
 

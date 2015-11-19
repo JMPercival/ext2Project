@@ -14,5 +14,16 @@ directory_type = {
     4:"Block device",
     5:"FIFO",
     6:"Socket",
-    7:"Symbolic link (soft link)",
+    7:"Symbolic link (soft link)"
+}
+
+directory_type_letter = {
+    0:"U",
+    1:"-",
+    2:"d",
+    3:"c",
+    4:"b",
+    5:"p",
+    6:"s",
+    7:"l"
 }
