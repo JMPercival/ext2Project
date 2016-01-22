@@ -26,7 +26,7 @@ class hddParse:
             tempPartFrame['size']=int(littleEndian(getHex(part,12,16)), 16)
             tempPartFrame['part_type']=partData.partition_type[getHex(part, 4)]
             self.partsFrame.append(tempPartFrame)
-        self.filesystem = ext2(self.partsFrame[1])
+        self.filesystem = ext2(self.partsFrame[0])
 
     def acceptUserInput(self):
         while(1):
@@ -48,6 +48,8 @@ class hddParse:
             self.userPWD()
         elif user_input[:4] == 'quit':
             self.userQUIT()
+        elif user_input[:3] == 'cat':
+            self.userCAT(user_input_options[0])
         else:
             print('Bad command given')
 
@@ -83,6 +85,10 @@ class hddParse:
         if 'i' in user_option:
             inode = True
         self.filesystem.userLS(long=long, inode=inode)
+
+    def userCAT(self, user_option):
+        return_message = self.filesystem.userCAT(user_option)
+        print(return_message)
 
     def userPWD(self):
         print(self.currentDir)

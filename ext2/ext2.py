@@ -9,12 +9,19 @@ import ext2.directory as directory
 import dataStructures.filetree as filetree
 
 class ext2:
-    def iterateGroupGenerator(self):
-        for group in range(self.sb.desc_block_num):
-            pass
-
     #this is the lazy way of doing this, it will have to be upgraded to a generator later
     def buildGroupDescriptors(self):
+        """
+        Builds the group descriptors for the class. 
+        Note: only uses the first Block. Needs to be expanded to check other blocks to make sure these are corrupted
+
+        Args: 
+            None
+        Return:
+            None
+        Creates:
+            self.groupDescs (A list of ext2.groupDescriptor)
+        """
         self.groupDescs = []
         #need to pull out the location first for speed purposes
         descGroupHex = getLocation(0x20 * (self.sb.desc_block_num), 0x1200)
@@ -22,6 +29,19 @@ class ext2:
             self.groupDescs.append(groupDescriptor.groupDescriptor(getHex(descGroupHex, 0x20*groupDescInd, 0x20+0x20*groupDescInd)))
 
     def buildLocations(self):
+        """
+        Builds the indoe table locations, block bitmaps and inode bitmaps
+        Note: it would be nice to find these dynamically but would take a ton of rework on code
+
+        Args:
+            None
+        Return:
+            None
+        Creates:
+            self.inode_tables_location_to_groups (Dict of byte location for inodes)
+            self.block_bitmaps (Dict of block and its block bitmap)
+            self.inode_bitmaps (Dict of block and its inode bitmap)
+        """
         self.inode_tables_location_to_groups = {}
         self.block_bitmaps = {}
         self.inode_bitmaps = {}
@@ -36,8 +56,14 @@ class ext2:
             counter+=1
 
     def buildRootDir(self):
+        """
+        
+        """
         root_directory_inode = self.getInode(2)
-        self.current_dir_list = self.getDirectoryList(root_directory_inode)
+        current_dir_num_list = self.getDirectoryList(root_directory_inode)
+        self.current_dir_list = []
+        for current_dir_num in current_dir_num_list:
+            self.current_dir_list += self.getDirectoryBlock(current_dir_num)
 
     def getInode(self, num):
         num = num - 1 #there is not 0 inode so we shift what we asked for down to comply with FS
@@ -58,68 +84,77 @@ class ext2:
         #print(newInode.part)
         return newInode
 
-    #pretty sure I am going to not do this... takes too much ram to build the full tree...
-    def buildFileTree(self):
-        #print('here2')
-        root_directory_inode = self.getInode(2)
-        #print(root_directory_inode.i_block_dict)
-        #print(root_directory_inode.i_block)
-        #builds tree root
-        root_directory_list = self.getDirectoryList(root_directory_inode)
-
-        tree_dict = self.recurBuildFileTree(root_directory_list)
-        print(tree_dict)
-
-    #since I am not building the tree... this gets to be deprecated....
-    def recurBuildFileTree(self, dirs):
-        files = []
-        dir_dict = {}
-        for dir in dirs:
-            if dir.isFiletype() and partData.directory_type[int(dir.file_type,16)] == "Directory":
-                newDirs = self.getDirectoryList(self.getInode(int(dir.inode,16)))
-                dir_dict[dir] = self.recurBuildFileTree(newDirs)
-            elif dir.isFiletype() == False:
-                #TODO: handle if the directory has no filetype
-                print("The directory has no filetype, this isn't handled yet.")
-                sys.exit(0)
+    def getIndirectBlocks(self, block):
+        blocks = []
+        for ind in int(self.sb.block_size/4):
+            #I am pretty sure these values are little endian but I would need to check source again
+            block_to_add = getHex(block, ind*4, ind*4+4, True)
+            if int(block_to_add, 16) != 0:
+                blocks.append(block_to_add)
             else:
-                files.append(dir)
+                return [blocks, True]
 
-        dir_dict['files'] = files
-        return dir_dict
+        return [blocks, False]
+
+    #TODO: FIX THIS SHIT BECAUSE ITS NOT DONE...
 
     def getDirectoryList(self, inode):
         blocksNeeded = []
-        for single_i_block in inode.i_block_list:
+        block_filled = False
+
+        #Direct Blocks(12)
+        for single_i_block in inode.i_block_list[:-3]:
             if single_i_block != False:
                 blocksNeeded.append(int(single_i_block,16))
             else:
+                block_filled = True
                 break
 
-        #print(inode.i_block)
-        #print(inode.i_block_list) 
-        #print(blocksNeeded)
 
-        #TODO: URGENT: Add single, double, and triple redirects
-        directoryList = []
-        for blockNeeded in blocksNeeded:
-            directoryList += self.getDirectoryBlock(blockNeeded)
+        #TODO: Triple does double with an additional loop and same with double to single
+        #TODO: So, it would be nice if you turned these into another function to not repeat code
+        #Single Indirect Block(1)
+        if not block_filled and inode.i_block_dict['singleIndirect'] != False:
+            single_indirect_block = self.getDirectoryRawBlock(inode.i_block_dict['singleIndirect'])
+            direct_blocks, block_filled = self.getIndirectBlocks(single_indirect_block)
+            blocksNeeded += direct_blocks
 
-        return directoryList
+        #Double Indirect Block(1)
+        if not block_filled and inode.i_block_dict['doubleIndirect'] != False:
+            double_indirect_block = self.getDirectoryRawBlock(inode.i_block_dict['doubleIndirect'])
+            single_indirect_block_list, block_filled = self.getIndirectBlocks(double_indirect_block)
+            for single_indirect_block_loc in single_indirect_block_list:
+                single_indirect_block = self.getDirectoryRawBlock(single_indirect_block_loc)
+                direct_blocks, block_filled = self.getIndirectBlocks(single_indirect_block)
+                blocks_needed += direct_blocks
+
+        #Triple Indirect Block(1)
+        if not block_filled and inode.i_block_dict['tripleIndirect'] != False:
+            triple_indirect_block = self.getDirectoryRawBlock(inode.i_block_dict['tripleIndirect'])
+            double_indirect_block_list, block_filled = self.getIndirectBlocks(triple_indirect_block)
+            for double_indirect_block_loc in double_indirect_block_list:
+                double_indirect_block = self.getDirectoryRawBlock(double_indirect_block_loc)
+                single_indirect_block_list, block_filled = self.getIndirectBlocks(double_indirect_block)
+                for single_indirect_block_loc in single_indirect_block_list:
+                    single_indirect_block = self.getDirectoryRawBlock(single_indirect_block_loc)
+                    direct_blocks, block_filled = self.getIndirectBlocks(single_indirect_block)
+                    blocks_needed += direct_blocks
+
+        return blocksNeeded
 
     def getDirectoryBlock(self, blockNeeded):
-        #print('here')
         directoryList = []
         raw_block = getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size)
         count=0
         while raw_block != '':
-            #print(len(raw_block))
-            #print(raw_block[:90])
             count+=1
             newDir = directory.directory(raw_block,self.sb)
             directoryList.append(newDir)
             raw_block = raw_block[int(newDir.rec_len, 16)*2:]
         return directoryList
+
+    def getDirectoryRawBlock(self, blockNeeded):
+        return getLocation(self.sb.block_size, self.part + blockNeeded * self.sb.block_size)
 
     def __init__(self, part):
         self.part = part['start']*512
@@ -147,7 +182,10 @@ class ext2:
 
     def userCDSwitchDir(self, dir_object):
         new_directory_inode = self.getInode(int(dir_object.inode,16))
-        self.current_dir_list = self.getDirectoryList(new_directory_inode)
+        current_dir_num_list = self.getDirectoryList(new_directory_inode)
+        self.current_dir_list = []
+        for current_dir_num in current_dir_num_list:
+            self.current_dir_list += self.getDirectoryBlock(current_dir_num)
 
     def userLS(self, long=False, inode=False):
         if long or inode:
@@ -192,7 +230,18 @@ class ext2:
                 newline_counter += 1
             print('')
 
+    def userCAT(self, filename):
+        if filename == '':
+            return 'No Filename Given'
 
+        for dir_object in self.current_dir_list:
+            if filename == dir_object.decoded_name and dir_object.isFiletype() and partData.directory_type[int(dir_object.file_type, 16)] == 'Regular file':
+                directory_num_list = self.getDirectoryList(self.getInode(int(dir_object.inode, 16)))
+                data_encoded = ''
+                for directory_num in directory_num_list:
+                    data_encoded += self.getDirectoryRawBlock(directory_num)
+                data_decoded = ''.join([chr(int(data_encoded[c:c+2], 16)) for c in range(0,len(data_encoded),2)])
+                return data_decoded
 
 
 
